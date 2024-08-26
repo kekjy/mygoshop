@@ -1,0 +1,42 @@
+
+<style>
+  body,
+  html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ffffff, #ffffff);
+    font-family: 'Arial', sans-serif;
+  }
+
+  .container {
+    margin-top: 300px;
+    text-align: center;
+  }
+
+  .hello-text {
+    font-size: 50px;
+    color: rgb(95, 186, 228);
+    text-shadow: 2px 2px 8px rgba(124, 36, 175, 0.2);
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+</style>
+
+<div class="container">
+  <h1 class="hello-text">Welcome to MYGOShop</h1>
+</div>

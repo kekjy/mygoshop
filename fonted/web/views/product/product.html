@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    margin: 0 auto;
+  }
+
+  .top-section {
+    display: flex;
+    margin-top: 20px;
+  }
+
+  .image-container {
+    flex: 1;
+    text-align: center;
+  }
+
+  .image-container img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .info-container {
+    flex: 1;
+    padding: 20px;
+  }
+
+  .info-container h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .info-container .price {
+    font-size: 20px;
+    color: red;
+    margin-bottom: 20px;
+  }
+
+  .info-container button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  .info-container button:hover {
+    background-color: #218838;
+  }
+
+  .description {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+  }
+
+  .description h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+
+  .description p {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  #getButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.3s;
+  }
+
+  #getButton:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+  }
+
+  #getButton:disabled {
+    background-color: #c3e6cb;
+    cursor: not-allowed;
+  }
+</style>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商品介绍</title>
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="top-section">
+      <div class="image-container">
+        <img src="{{.product.ProductImage}}">
+      </div>
+      <div class="info-container">
+        <h1>{{.product.ProductName}}</h1>
+        <div class="price">商品数量: {{.product.ProductNum}}</div>
+        <input id="productID" value="{{.product.ID}}" hidden>
+        <input type="button" value="立即抢购" id="getButton" onclick="rushToBuy()">
+      </div>
+    </div>
+    <div class="description">
+      <h2>商品介绍</h2>
+      <p> {{.product.ProductInfo}} </p>
+      <p><a href="{{.product.ProductGHURL}}">了解更多</p>
+    </div>
+  </div>
+
+  <script>
+    var Host = "127.0.0.1"
+    var Port = "8080"
+    // 用户 ID 的 cookie 名称
+    var userString = "uid"
+    // 抢购按钮 ID
+    var rushButtonID = "getButton"
+    // 跳转地址
+    var redirectUrl = "/user/login"
+    // 时间间隔
+    var interval = 10
+    // 计数器
+    var count = interval
+    // 定时器
+    var inter
+
+    // 获取浏览器 cookie
+    function getCookie(name) {
+      var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+      if (arr = document.cookie.match(reg)) {
+        return unescape(arr[2]);
+      } else {
+        return null;
+      }
+    }
+
+    // 若干目前用户尚未登录，就重定向到登录页面
+    if (getCookie(userString) == null) {
+      location.href = redirectUrl
+    }
+
+    function rushToBuy() {
+      // 获取要携带的参数
+      var productID = document.getElementById("productID").value;
+      // 设置按钮不可用
+      document.getElementById(rushButtonID).setAttribute("disabled", true)
+      // 开始倒计时
+      timeSub();
+
+      // 发送异步请求
+      // 1.创建 ajax 引擎对象
+      var xmlHttp;
+      if (window.XMLHttpRequest) {
+        // IE7+, Firefox, Chrome, Opera, Safari
+        xmlHttp = new XMLHttpRequest();
+      } else {
+        // IE6, IE5
+        xmlHttp = new ActiveXObject("Microsoft.XMLHTTP")
+      }
+
+      // 2.为引擎对象绑定监听事件
+      xmlHttp.onreadystatechange = function () {
+        // 等待服务器响应
+        if (xmlHttp.readyState == 4) {
+          // 当前状态为 4 时，说明请求完成
+          if (xmlHttp.status == 200) {
+            // 判断服务器状态码
+            // 取出响应数据
+            var result = xmlHttp.responseText;
+            // 判断状态
+            if (result == "false") {
+              alert("未抢到，请稍后重试!");
+            } else {
+              alert("抢购成功!")
+            }
+          }
+        }
+      }
+
+      // 3.绑定请求服务器地址
+      xmlHttp.open("GET", "http://" + Host + ":" + Port + "/product/order?productID=" + productID, true);
+      // 4.发送请求
+      xmlHttp.send()
+    }
+
+    function timeSub() {
+      inter = setInterval("timeFunc()", 1000)
+    }
+
+    function timeFunc() {
+      count--;
+      if (count <= 0) {
+        count = interval;
+        // 打开按钮
+        document.getElementById(rushButtonID).removeAttribute("disabled")
+        // 设置按钮名称
+        document.getElementById(rushButtonID).value = "立即抢购"
+        clearInterval(inter)
+      } else {
+        document.getElementById(rushButtonID).value = "抢购等待" + count + "秒";
+      }
+    }
+  </script>
+</body>
+
+</html>
