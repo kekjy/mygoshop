@@ -3,6 +3,7 @@ package common
 import (
 	"hash/crc32"
 	"sort"
+	"strconv"
 	"sync"
 )
 
@@ -26,8 +27,9 @@ func NewHashRing() *HashRing {
 func (hr *HashRing) Add(id string) {
 	hr.Lock()
 	defer hr.Unlock()
-	for range hr.virtualNode {
-		hash := hr.HashFn([]byte(id))
+	for i := range hr.virtualNode {
+		virtualNodeKey := id + "#" + strconv.Itoa(i)
+		hash := hr.HashFn([]byte(virtualNodeKey))
 		hr.nodes = append(hr.nodes, hash)
 		hr.nodemap[hash] = id
 	}

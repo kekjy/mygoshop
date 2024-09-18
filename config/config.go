@@ -24,6 +24,12 @@ var (
 	Interval = 5
 )
 
+// rocketmq setting
+var ROCKSet = &__webSetting{
+	Host: "172.29.125.42",
+	Port: "9876",
+}
+
 // rabbitmq setting
 // url：amqp://user:password @RabbitMQ_host:port/Vhost
 var RMQSet = &__rmqSetting{
